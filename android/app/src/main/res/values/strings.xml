@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Evolution simulator</string>
+    <string name="title_activity_main">Evolution simulator</string>
+    <string name="package_name">com.asket888.evolutionsimulator</string>
+    <string name="custom_url_scheme">com.asket888.evolutionsimulator</string>
+</resources>
