@@ -5,13 +5,15 @@ import { World } from './sim/world'
 import { drawAquarium } from './ui/drawAquarium'
 import { HistoryChart } from './ui/HistoryChart'
 
+// 1× = 15 ticks per second (a quarter of a tick per animation frame)
 const SPEEDS = [
-  { label: '¼×', ticksPerFrame: 0.25 },
-  { label: '1×', ticksPerFrame: 1 },
-  { label: '3×', ticksPerFrame: 3 },
-  { label: '10×', ticksPerFrame: 10 },
-  { label: '30×', ticksPerFrame: 30 },
+  { label: '½×', ticksPerFrame: 0.125 },
+  { label: '1×', ticksPerFrame: 0.25 },
+  { label: '4×', ticksPerFrame: 1 },
+  { label: '12×', ticksPerFrame: 3 },
+  { label: '40×', ticksPerFrame: 10 },
 ]
+const DEFAULT_SPEED = 1 // 1×
 const SKIP_GENERATIONS = 10
 const GENERATIONS_PER_FRAME_WHEN_SKIPPING = 2
 const PANEL_UPDATE_EVERY_FRAMES = 6
@@ -44,7 +46,7 @@ function App() {
   // every 'New world' click creates a new world, even with the same seed
   const [worldKey, setWorldKey] = useState({ seed: defaultSettings.seed, run: 0 })
   const [playing, setPlaying] = useState(true)
-  const [speed, setSpeed] = useState(1)
+  const [speed, setSpeed] = useState(DEFAULT_SPEED)
 
   // a new world for every "New world" click
   useEffect(() => {

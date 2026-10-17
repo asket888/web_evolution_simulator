@@ -96,12 +96,12 @@ describe('herbivores', () => {
 })
 
 describe('creatures', () => {
-  it('stop at a wall, lose the velocity into it and pay the wall penalty', () => {
-    const o = org(3.9, 0)
+  it('stop when the edge of the body touches a wall, lose the velocity into it and pay the wall penalty', () => {
+    const o = org(3.8, 0)
     o.xVelocity = 0.9
     o.brain.who[0][0] = 0 // no thrust
     o.think(s)
-    expect(o.x).toBe(4)
+    expect(o.x).toBeCloseTo(s.x_max + 1 - s.org_radius)
     expect(o.xVelocity).toBe(0)
     expect(o.fitness).toBeCloseTo(s.org_start_fitness - s.org_hunger_penalty - s.org_wall_penalty)
   })

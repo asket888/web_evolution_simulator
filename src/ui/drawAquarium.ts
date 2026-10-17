@@ -12,13 +12,12 @@ const COLORS = {
   deadPredator: '#9aa0a6',
 }
 
-// creatures are drawn a bit bigger than their touching distance, otherwise they are hard to see on a phone
-const RADIUS = { food: 0.04, herbivore: 0.07, predator: 0.1 }
+const FOOD_RADIUS = 0.04
 
-/** Draws the aquarium of the world on a square canvas: walls are at the edge of the canvas. */
+/** Draws the aquarium of the world on a square canvas: the walls are the edges of the canvas. */
 export function drawAquarium(ctx: CanvasRenderingContext2D, world: World): void {
   const size = ctx.canvas.width
-  const half = world.settings.x_max + 1 // creatures move in [-half, half]
+  const half = world.settings.x_max + 1 // the walls are at -half and half
   const scale = size / (2 * half)
   const px = (x: number) => (x + half) * scale
   const py = (y: number) => (half - y) * scale // y grows upwards like in the Python plots
@@ -44,24 +43,24 @@ export function drawAquarium(ctx: CanvasRenderingContext2D, world: World): void 
     ctx.stroke()
   }
 
-  for (const food of world.foods) circle(food.x, food.y, RADIUS.food, COLORS.food)
+  for (const food of world.foods) circle(food.x, food.y, FOOD_RADIUS, COLORS.food)
 
   for (const org of world.organisms) {
     if (org.eaten) continue
     if (org.alive) {
       tail(org, COLORS.herbivoreTail, 1.5)
-      circle(org.x, org.y, RADIUS.herbivore, COLORS.herbivore)
+      circle(org.x, org.y, org.radius, COLORS.herbivore)
     } else {
-      circle(org.x, org.y, RADIUS.herbivore, COLORS.body)
+      circle(org.x, org.y, org.radius, COLORS.body)
     }
   }
 
   for (const pred of world.predators) {
     if (pred.alive) {
       tail(pred, COLORS.predatorTail, 2.5)
-      circle(pred.x, pred.y, RADIUS.predator, COLORS.predator)
+      circle(pred.x, pred.y, pred.radius, COLORS.predator)
     } else {
-      circle(pred.x, pred.y, RADIUS.predator, COLORS.deadPredator)
+      circle(pred.x, pred.y, pred.radius, COLORS.deadPredator)
     }
   }
 }

@@ -17,6 +17,7 @@ export interface Settings {
   food_energy: number // energy of one food particle
 
   // herbivores
+  org_radius: number // body radius: touches walls with its edge (also the drawn size)
   org_vision_dist: number
   org_momentum: number // velocity kept from the previous tick
   org_thrust: number // how much the network output changes velocity per tick
@@ -30,6 +31,7 @@ export interface Settings {
 
   // predators
   pred_create: boolean
+  pred_radius: number
   pred_vision_dist: number
   pred_momentum: number
   pred_thrust: number
@@ -72,6 +74,7 @@ export const defaultSettings: Settings = {
 
   food_energy: 2,
 
+  org_radius: 0.07,
   org_vision_dist: 5,
   org_momentum: 0.9,
   org_thrust: 0.2,
@@ -84,6 +87,7 @@ export const defaultSettings: Settings = {
   org_wall_penalty: 0.03,
 
   pred_create: true,
+  pred_radius: 0.1,
   pred_vision_dist: 10,
   pred_momentum: 0.8125,
   pred_thrust: 0.3,

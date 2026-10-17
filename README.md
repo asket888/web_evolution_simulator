@@ -15,7 +15,7 @@ rewritten in TypeScript. The Python version is the reference for the simulation 
 
 - the live aquarium: green – herbivores (with the tail of the last move), blue – food, red – predators,
   yellow – dead herbivores (bodies), gray – dead predators
-- Play / Pause, speed (¼× … 30× ticks per frame), **+10 generations** fast-forward
+- Play / Pause, speed ½× … 40× (1× = 15 ticks per second), **+10 generations** fast-forward
 - **Seed** + **New world**: the same seed gives the same run
 - stats of the last finished generation and a chart: herbivores / predators survived and herbivores killed by generation
 

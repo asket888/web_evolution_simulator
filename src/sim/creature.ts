@@ -12,7 +12,8 @@ export abstract class Creature {
   readonly momentum: number
   readonly thrust: number
 
-  readonly xMax: number
+  readonly radius: number // body size: the creature touches a wall with its edge, not its centre
+  readonly xMax: number // how far the centre can go
   readonly yMax: number
 
   x: number
@@ -37,8 +38,9 @@ export abstract class Creature {
     this.momentum = settings[`${kind}_momentum`]
     this.thrust = settings[`${kind}_thrust`]
 
-    this.xMax = settings.x_max + 1
-    this.yMax = settings.y_max + 1
+    this.radius = settings[`${kind}_radius`]
+    this.xMax = settings.x_max + 1 - this.radius
+    this.yMax = settings.y_max + 1 - this.radius
 
     this.x = random.uniform(settings.x_min - 1, settings.x_max + 1)
     this.y = random.uniform(settings.y_min - 1, settings.y_max + 1)
@@ -82,7 +84,7 @@ export abstract class Creature {
     }
   }
 
-  /** Hitting a wall stops the movement into it, so the creature does not stay pressed to it. */
+  /** Hitting a wall (with the edge of the body) stops the movement into it, so the creature does not stay pressed to it. */
   private move(): void {
     this.x += this.xVelocity
     if (Math.abs(this.x) > this.xMax) {
