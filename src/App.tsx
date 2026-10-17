@@ -3,15 +3,17 @@ import { defaultSettings } from './sim/settings'
 import type { GenerationStats } from './sim/stats'
 import { World } from './sim/world'
 import { drawAquarium } from './ui/drawAquarium'
+import { drawFastForward, drawTransition, type Transition } from './ui/drawTransition'
 import { HistoryChart } from './ui/HistoryChart'
 
-// 1× = 15 ticks per second (a quarter of a tick per animation frame)
+// 1× = 15 ticks per second (a quarter of a tick per animation frame);
+// the fog between generations is shorter at higher speeds
 const SPEEDS = [
-  { label: '½×', ticksPerFrame: 0.125 },
-  { label: '1×', ticksPerFrame: 0.25 },
-  { label: '4×', ticksPerFrame: 1 },
-  { label: '12×', ticksPerFrame: 3 },
-  { label: '40×', ticksPerFrame: 10 },
+  { label: '½×', ticksPerFrame: 0.125, transitionMs: 2400 },
+  { label: '1×', ticksPerFrame: 0.25, transitionMs: 2000 },
+  { label: '4×', ticksPerFrame: 1, transitionMs: 1200 },
+  { label: '12×', ticksPerFrame: 3, transitionMs: 700 },
+  { label: '40×', ticksPerFrame: 10, transitionMs: 400 },
 ]
 const DEFAULT_SPEED = 1 // 1×
 const SKIP_GENERATIONS = 10
@@ -41,6 +43,7 @@ function App() {
   const canvas = useRef<HTMLCanvasElement>(null)
   const world = useRef<World | null>(null)
   const skipLeft = useRef(0)
+  const transition = useRef<Transition | null>(null) // fog between generations
   const [view, setView] = useState<View | null>(null)
   const [seed, setSeed] = useState(defaultSettings.seed)
   // every 'New world' click creates a new world, even with the same seed
@@ -52,6 +55,7 @@ function App() {
   useEffect(() => {
     world.current = new World({ ...defaultSettings, seed: worldKey.seed })
     skipLeft.current = 0
+    transition.current = null
     setView(snapshot(world.current, 0))
   }, [worldKey])
 
@@ -62,8 +66,11 @@ function App() {
     let frame = 0
     let pending = 0 // fractional ticks for slow speeds
     let id = 0
+    let lastTime = 0
 
-    const loop = () => {
+    const loop = (now: number) => {
+      const dt = lastTime ? now - lastTime : 0
+      lastTime = now
       const w = world.current
       if (w) {
         const skipping = skipLeft.current > 0
@@ -72,11 +79,34 @@ function App() {
             w.runGeneration()
             skipLeft.current--
           }
-        } else if (playing) {
-          pending += SPEEDS[speed].ticksPerFrame
-          for (; pending >= 1; pending--) w.step()
+          transition.current = null
+          drawAquarium(ctx, w)
+          drawFastForward(ctx, w.generation, skipLeft.current)
+        } else {
+          if (playing && transition.current) transition.current.elapsed += dt
+          if (transition.current && transition.current.elapsed >= transition.current.duration) transition.current = null
+
+          if (playing && !transition.current) {
+            pending += SPEEDS[speed].ticksPerFrame
+            for (; pending >= 1; pending--) {
+              const finished = w.step()
+              if (finished) {
+                // keep the last frame of the finished generation (still on the canvas) for the fog transition
+                const from = document.createElement('canvas')
+                from.width = ctx.canvas.width
+                from.height = ctx.canvas.height
+                from.getContext('2d')?.drawImage(ctx.canvas, 0, 0)
+                transition.current = { from, finished, duration: SPEEDS[speed].transitionMs, elapsed: 0 }
+                pending = 0
+                break
+              }
+            }
+          }
+
+          const t = transition.current
+          if (t) drawTransition(ctx, t, () => drawAquarium(ctx, w))
+          else drawAquarium(ctx, w)
         }
-        drawAquarium(ctx, w)
         if (skipping || ++frame % PANEL_UPDATE_EVERY_FRAMES === 0) setView(snapshot(w, skipLeft.current))
       }
       id = requestAnimationFrame(loop)

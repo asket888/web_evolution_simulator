@@ -1,6 +1,7 @@
 /**
- * Simulation parameters. Names and default values are the same as in the Python version (settings.py),
- * so both versions can be compared one to one.
+ * Simulation parameters. Names are the same as in the Python version (settings.py). Defaults differ in:
+ * - ticks 200 instead of 100, with per-tick hunger and penalties halved (the same energy budget per generation)
+ * - org_radius / pred_radius: creatures touch walls with the edge of the body
  */
 export interface Settings {
   // evolution
@@ -82,9 +83,9 @@ export const defaultSettings: Settings = {
   org_start_fitness: 5,
   org_eat_dist: 0.15,
   org_org_dist: 0.1,
-  org_org_penalty: 0.06,
-  org_hunger_penalty: 0.07,
-  org_wall_penalty: 0.03,
+  org_org_penalty: 0.03,
+  org_hunger_penalty: 0.035,
+  org_wall_penalty: 0.015,
 
   pred_create: true,
   pred_radius: 0.1,
@@ -98,12 +99,12 @@ export const defaultSettings: Settings = {
   pred_carrion_energy: 6,
   pred_body_priority: 'always',
   pred_pred_dist: 0.2,
-  pred_pred_penalty: 0.2,
-  pred_hunger_penalty: 0.07,
-  pred_wall_penalty: 0.03,
+  pred_pred_penalty: 0.1,
+  pred_hunger_penalty: 0.035,
+  pred_wall_penalty: 0.015,
 
   seed: 333,
-  ticks: 100,
+  ticks: 200,
   corpse_momentum: 0.7,
   x_min: -3,
   x_max: 3,

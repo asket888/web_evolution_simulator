@@ -5,13 +5,21 @@
  *   node scripts/balance.ts            # default settings
  *   node scripts/balance.ts --no-pred  # herbivores only
  *   node scripts/balance.ts --20       # 20 seeds instead of 5
+ *   node scripts/balance.ts --set ticks=200 --set org_hunger_penalty=0.035  # override any setting
  */
-import { defaultSettings } from '../src/sim/settings.ts'
+import { defaultSettings, type Settings } from '../src/sim/settings.ts'
 import type { GenerationStats } from '../src/sim/stats.ts'
 import { World } from '../src/sim/world.ts'
 
 const seeds = process.argv.includes('--20') ? Array.from({ length: 20 }, (_, i) => i) : [333, 1, 2, 3, 4]
-const settings = { ...defaultSettings, pred_create: !process.argv.includes('--no-pred') }
+const settings: Settings = { ...defaultSettings, pred_create: !process.argv.includes('--no-pred') }
+process.argv.forEach((arg, i) => {
+  if (arg !== '--set') return
+  const [key, raw] = process.argv[i + 1].split('=')
+  if (!(key in settings)) throw new Error(`unknown setting ${key}`)
+  const value = raw === 'true' ? true : raw === 'false' ? false : Number.isNaN(Number(raw)) ? raw : Number(raw)
+  Object.assign(settings, { [key]: value })
+})
 
 const runs: GenerationStats[][] = seeds.map((seed) => {
   const world = new World({ ...settings, seed })
@@ -28,7 +36,8 @@ const block = (metric: (g: GenerationStats) => number) => {
   return cells.join(' ')
 }
 
-console.log(`TypeScript, ${seeds.length} seeds, ${settings.gens} generations, predators ${settings.pred_create ? 'on' : 'off'}`)
+const overrides = process.argv.flatMap((arg, i) => (arg === '--set' ? [process.argv[i + 1]] : []))
+console.log(`TypeScript, ${seeds.length} seeds, ${settings.gens} generations, predators ${settings.pred_create ? 'on' : 'off'}${overrides.length ? ', ' + overrides.join(' ') : ''}`)
 console.log('  herb dead  ', block((g) => (g.count - g.survived) / g.count))
 console.log('  killed     ', block((g) => g.killed / g.count))
 console.log('  bodies     ', block((g) => g.bodiesEaten / g.count))

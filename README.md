@@ -16,10 +16,14 @@ rewritten in TypeScript. The Python version is the reference for the simulation 
 - the live aquarium: green – herbivores (with the tail of the last move), blue – food, red – predators,
   yellow – dead herbivores (bodies), gray – dead predators
 - Play / Pause, speed ½× … 40× (1× = 15 ticks per second), **+10 generations** fast-forward
+- a generation lasts 200 ticks (~13 s at 1×); between generations the aquarium fades into fog with the number
+  of the next generation and a short summary of the finished one
 - **Seed** + **New world**: the same seed gives the same run
 - stats of the last finished generation and a chart: herbivores / predators survived and herbivores killed by generation
 
-The rules are the same as in the Python version: see its README for how herbivores, predators and evolution work.
+The rules are the same as in the Python version (see its README for how herbivores, predators and evolution work),
+except: a generation is 200 ticks instead of 100 with per-tick hunger and penalties halved (the same energy budget
+per generation), and creatures touch walls with the edge of the body, not the centre.
 
 ## Stack
 
